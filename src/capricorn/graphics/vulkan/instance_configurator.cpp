@@ -5,6 +5,11 @@
 
 namespace cc::vk
 {
+	instance_create_info& instance_configurator::get_create_info() noexcept
+	{
+		return m_info;
+	}
+
 	instance_configurator& instance_configurator::set_application_name(const char* name)
 	{
 		m_info.p_application_name = name;

@@ -171,7 +171,7 @@ namespace cc::vk
 		device_create_info.enabledExtensionCount   = static_cast<u32>(m_create_info.required_device_extensions.size());
 		device_create_info.ppEnabledExtensionNames = m_create_info.required_device_extensions.data();
 
-		if (m_create_info.instance.lock()->get_create_info().validation_layers_enabled)
+		if (m_create_info.instance.lock()->validation_layers_enabled())
 		{
 			device_create_info.enabledLayerCount   = static_cast<u32>(m_create_info.required_validation_layers.size());
 			device_create_info.ppEnabledLayerNames = m_create_info.required_validation_layers.data();

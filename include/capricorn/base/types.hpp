@@ -7,6 +7,7 @@
 #include "capricorn/base/log.hpp"
 
 #include <cstdint>
+#include <vulkan/vulkan.h>
 
 using i8  = int8_t;
 using i16 = int16_t;

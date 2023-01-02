@@ -3,15 +3,26 @@
 
 #include "capricorn/graphics/graphics_context.hpp"
 
+#include "capricorn/graphics/vulkan/instance_configurator.hpp"
+
 namespace cc
 {
 	graphics_context::graphics_context(const graphics_context_create_info& create_info)
 	    : m_window(create_info.p_window)
 	{
-		vk::instance_create_info const instance_create_info = create_info.instance_create_info;
+		vk::instance_configurator instance_configurator;
 
-		m_instance = vk::instance::create(instance_create_info);
-		m_surface  = m_instance->create_surface(m_window);
+		vk::instance_create_info const instance_create_info = instance_configurator
+		                                                              .set_application_name("Sample application")
+		                                                              .set_engine_name("Capricorn")
+		                                                              .set_application_version(1, 0, 0)
+		                                                              .set_engine_version(1, 0, 0)
+		                                                              .set_api_version(1, 0, 0)
+		                                                              //.add_enabled_layer("VK_LAYER_KHRONOS_validation")
+		                                                              //.add_enabled_extension(VK_KHR_SURFACE_EXTENSION_NAME)
+		                                                              .get_create_info();
+
+		m_instance = std::make_unique<vk::instance>(instance_create_info);
 
 		vk::device_create_info const device_create_info = {
 		        m_instance,

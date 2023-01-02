@@ -12,7 +12,6 @@ namespace cc
 	struct graphics_context_create_info
 	{
 		std::weak_ptr<GLFWwindow> p_window;
-		vk::instance_create_info instance_create_info = {};
 	};
 
 	class graphics_context

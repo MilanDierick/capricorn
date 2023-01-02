@@ -29,8 +29,7 @@ namespace cc
 		};
 
 		graphics_context_create_info const graphics_context_create_info = {
-		        .p_window             = m_window,
-		        .instance_create_info = instance_create_info,
+		        .p_window = m_window,
 		};
 
 		m_graphics_context = graphics_context::create(graphics_context_create_info);

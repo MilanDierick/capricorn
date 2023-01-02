@@ -23,7 +23,7 @@ namespace cc::vk
 		instance_create_enumerate_portability_bit_khr = 0x00000001,
 	};
 
-	struct instance_create_info_new
+	struct instance_create_info
 	{
 		// Application information.
 		const char* p_application_name;
@@ -63,27 +63,31 @@ namespace cc::vk
 		instance()  = default;
 		~instance() = default;
 
-		explicit instance(const instance_create_info_new& params);
+		explicit instance(const instance_create_info& params);
 
 		instance(const instance& other)                = delete;
 		instance(instance&& other) noexcept            = delete;
 		instance& operator=(const instance& other)     = delete;
 		instance& operator=(instance&& other) noexcept = delete;
 
-		static std::shared_ptr<instance> create(const instance_create_info_new& create_info);
+		cc_nodiscard explicit operator VkInstance() const noexcept;
+
+		static std::shared_ptr<instance> create(const instance_create_info& create_info);
 
 		cc_nodiscard std::weak_ptr<VkInstance> get_handle() const noexcept;
+		cc_nodiscard b8 validation_layers_enabled() const noexcept;
 
 	private:
-		std::shared_ptr<VkInstance> m_instance                      = nullptr;
-		std::shared_ptr<VkDebugUtilsMessengerEXT> m_debug_messenger = nullptr;
-		std::shared_ptr<VkAllocationCallbacks> m_allocator          = nullptr;
-		PFN_vkGetInstanceProcAddr m_get_instance_proc_addr          = nullptr;
-		PFN_vkGetDeviceProcAddr m_get_device_proc_addr              = nullptr;
+		std::shared_ptr<VkInstance> m_instance                      = VK_NULL_HANDLE;
+		std::shared_ptr<VkDebugUtilsMessengerEXT> m_debug_messenger = VK_NULL_HANDLE;
+		std::shared_ptr<VkAllocationCallbacks> m_allocator          = VK_NULL_HANDLE;
+		PFN_vkGetInstanceProcAddr m_get_instance_proc_addr          = VK_NULL_HANDLE;
+		PFN_vkGetDeviceProcAddr m_get_device_proc_addr              = VK_NULL_HANDLE;
 
-		b8 properties2_ext_supported = false;
-		u32 instance_version         = VK_API_VERSION_1_0;
-		u32 api_version              = VK_API_VERSION_1_0;
+		b8 m_validation_layers_enabled = false;
+		b8 properties2_ext_supported   = false;
+		u32 instance_version           = VK_API_VERSION_1_0;
+		u32 api_version                = VK_API_VERSION_1_0;
 	};
 } // namespace cc::vk
 

@@ -20,6 +20,8 @@ namespace cc::vk
 		instance_configurator& operator=(const instance_configurator& other)     = delete;
 		instance_configurator& operator=(instance_configurator&& other) noexcept = delete;
 
+		instance_create_info& get_create_info() noexcept;
+
 		instance_configurator& set_application_name(const char* name);
 		instance_configurator& set_engine_name(const char* name);
 		instance_configurator& set_application_version(u32 major, u32 minor, u32 patch);
@@ -47,7 +49,7 @@ namespace cc::vk
 		instance_configurator& set_allocator(VkAllocationCallbacks* allocator);
 
 	private:
-		instance_create_info_new m_info;
+		instance_create_info m_info;
 	};
 } // namespace cc::vk
 

@@ -21,31 +21,31 @@ namespace cc::vk
 			return VK_FALSE;
 		}
 
-		std::vector<const char*> get_available_validation_layers()
+		std::vector<std::string> get_available_validation_layers()
 		{
 			std::vector<VkLayerProperties> available_layers;
 			vk_ensure(enumerate_vulkan_construct<VkLayerProperties>(available_layers, vkEnumerateInstanceLayerProperties), "Failed to enumerate available validation layers.");
 
-			std::vector<const char*> available_layer_names;
+			std::vector<std::string> available_layer_names;
 
 			for (const auto& layer: available_layers)
 			{
-				available_layer_names.push_back(layer.layerName);
+				available_layer_names.emplace_back(layer.layerName);
 			}
 
 			return available_layer_names;
 		}
 
-		std::vector<const char*> get_available_extensions()
+		std::vector<std::string> get_available_extensions()
 		{
 			std::vector<VkExtensionProperties> available_extensions;
 			vk_ensure(enumerate_vulkan_construct<VkExtensionProperties>(available_extensions, vkEnumerateInstanceExtensionProperties, nullptr), "Failed to enumerate available extensions.");
 
-			std::vector<const char*> available_extension_names;
+			std::vector<std::string> available_extension_names;
 
 			for (const auto& extension: available_extensions)
 			{
-				available_extension_names.push_back(extension.extensionName);
+				available_extension_names.emplace_back(extension.extensionName);
 			}
 
 			return available_extension_names;
@@ -63,7 +63,7 @@ namespace cc::vk
 		}
 	} // namespace details
 
-	instance::instance(const instance_create_info_new& params)
+	instance::instance(const instance_create_info& params)
 	{
 		if (params.p_application_name == nullptr)
 		{
@@ -79,9 +79,10 @@ namespace cc::vk
 
 		std::vector<const char*> extensions(params.enabled_extensions);
 		std::vector<const char*> const layers(params.enabled_layers);
+		std::vector<const char*> const glfw_extensions = glfw_shared_state::query_required_extensions();
 
 		// Add all required GLFW extensions.
-		extensions.insert(extensions.end(), glfw_shared_state::query_required_extensions().begin(), glfw_shared_state::query_required_extensions().end());
+		extensions.insert(extensions.end(), std::begin(glfw_extensions), std::end(glfw_extensions));
 
 		if (params.validation_layers_enabled)
 		{
@@ -121,23 +122,27 @@ namespace cc::vk
 		application_info.applicationVersion = params.application_version;
 		application_info.pEngineName        = params.p_engine_name;
 		application_info.engineVersion      = params.engine_version;
-		application_info.apiVersion         = params.api_version;
+		application_info.apiVersion         = VK_API_VERSION_1_0;
 
 		// Create the instance create info struct.
 		VkInstanceCreateInfo instance_create_info    = {};
 		instance_create_info.sType                   = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 		instance_create_info.pApplicationInfo        = &application_info;
-		instance_create_info.enabledLayerCount       = static_cast<u32>(params.enabled_layers.size());
-		instance_create_info.ppEnabledLayerNames     = params.enabled_layers.data();
-		instance_create_info.enabledExtensionCount   = static_cast<u32>(params.enabled_extensions.size());
-		instance_create_info.ppEnabledExtensionNames = params.enabled_extensions.data();
+		instance_create_info.enabledExtensionCount   = static_cast<uint32_t>(extensions.size());
+		instance_create_info.ppEnabledExtensionNames = extensions.data();
+		instance_create_info.enabledLayerCount       = static_cast<uint32_t>(layers.size());
+		instance_create_info.ppEnabledLayerNames     = layers.data();
+
+		VkInstance instance = VK_NULL_HANDLE;
 
 		// Create the instance.
-		if (vkCreateInstance(&instance_create_info, params.p_allocator, m_instance.get()) != VK_SUCCESS)
+		if (vkCreateInstance(&instance_create_info, params.p_allocator, &instance) != VK_SUCCESS)
 		{
 			log::error(log_source::renderer, "Failed to create vulkan instance.");
 			throw std::runtime_error("Failed to create vulkan instance.");
 		}
+
+		m_instance = std::make_shared<VkInstance>(instance);
 
 		// Create the debug messenger.
 		if (params.validation_layers_requested)
@@ -155,7 +160,12 @@ namespace cc::vk
 		log::info(log_source::renderer, "Vulkan instance created.");
 	}
 
-	std::shared_ptr<instance> instance::create(const instance_create_info_new& create_info)
+	instance::operator VkInstance() const noexcept
+	{
+		return *m_instance;
+	}
+
+	std::shared_ptr<instance> instance::create(const instance_create_info& create_info)
 	{
 		return std::make_shared<instance>(create_info);
 	}
@@ -163,5 +173,10 @@ namespace cc::vk
 	std::weak_ptr<VkInstance> instance::get_handle() const noexcept
 	{
 		return m_instance;
+	}
+
+	b8 instance::validation_layers_enabled() const noexcept
+	{
+		return m_validation_layers_enabled;
 	}
 } // namespace cc::vk
