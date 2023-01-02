@@ -5,8 +5,7 @@
 #define CAPRICORN_WINDOW_HPP
 
 #include "capricorn/base/types.hpp"
-
-#include <GLFW/glfw3.h>
+#include "capricorn/graphics/graphics_context.hpp"
 
 namespace cc
 {
@@ -25,16 +24,17 @@ namespace cc
 
 		void tick();
 
-		b8 should_close() const;
+		cc_nodiscard b8 should_close() const;
 
-		[[nodiscard]] GLFWwindow* get_native_window() const;
+		cc_nodiscard std::weak_ptr<GLFWwindow> get_native_window() const;
 
 	private:
-		GLFWwindow* m_window;
+		std::shared_ptr<GLFWwindow> m_window;
+		std::shared_ptr<graphics_context> m_graphics_context;
 
-		const char* m_p_title;
-		u32 m_width;
-		u32 m_height;
+		const char* m_p_title = nullptr;
+		u32 m_width = 0;
+		u32 m_height = 0;
 	};
 } // namespace cc
 

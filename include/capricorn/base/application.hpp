@@ -33,7 +33,7 @@ namespace cc
 		void shutdown();
 
 	private:
-		window* m_window;
+		std::shared_ptr<window> m_window;
 
 		application_state m_state;
 	};

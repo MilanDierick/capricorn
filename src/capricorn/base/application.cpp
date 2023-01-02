@@ -8,14 +8,13 @@
 namespace cc
 {
 	application::application()
-	    : m_window(nullptr),
+	    : m_window(),
 	      m_state(application_state::none)
 	{
 	}
 
 	application::~application()
 	{
-		delete m_window;
 	}
 
 	void application::initialize()
@@ -24,7 +23,7 @@ namespace cc
 
 		log::info(log_source::application, "Initializing Capricorn Engine...");
 
-		m_window = new window("Capricorn Engine", 1280, 720);
+		m_window = std::make_shared<window>("Capricorn Engine", 1280, 720);
 
 		m_state = application_state::initialized;
 	}

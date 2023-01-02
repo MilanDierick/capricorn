@@ -10,21 +10,6 @@ namespace cc
 {
 	std::shared_ptr<spdlog::logger> log::s_logger = nullptr;
 
-	constexpr std::string log_source_to_string(log_source source)
-	{
-		switch (source)
-		{
-			case log_source::none:
-				return "[NONE] ";
-			case log_source::application:
-				return "[APPLICATION] ";
-			case log_source::renderer:
-				return "[RENDERER] ";
-			default:
-				return "[UNKNOWN] ";
-		}
-	}
-
 	void log::initialize()
 	{
 		std::vector<spdlog::sink_ptr> log_sinks{};

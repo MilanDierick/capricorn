@@ -37,14 +37,27 @@ namespace cc
 		}
 	}
 
-	constexpr void vk_ensure(VkResult result, const char* message)
+	namespace vk
 	{
-		if (result != VK_SUCCESS)
+		constexpr void vk_ensure(VkResult result, const char* message)
 		{
-			log::critical(log_source::none, message);
-			throw;
+			if (result != VK_SUCCESS)
+			{
+				log::critical(log_source::none, message);
+				throw;
+			}
 		}
-	}
+
+		template<typename T>
+		constexpr std::vector<T> query_construct(VkInstance instance, const char* p_name)
+		{
+			u32 count = 0;
+			vkEnumerateInstanceExtensionProperties(p_name, &count, nullptr);
+			std::vector<T> extensions(count);
+			vkEnumerateInstanceExtensionProperties(p_name, &count, extensions.data());
+			return extensions;
+		}
+	} // namespace vk
 } // namespace cc
 
 #endif //CAPRICORN_TYPES_HPP
