@@ -15,7 +15,11 @@ namespace cc::vk
 		{
 			if (message_severity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT)
 			{
-				log::error(log_source::renderer, "Some message from vulkan: {}", p_callback_data->pMessage);
+				log::warn(log_source::renderer, p_callback_data->pMessage);
+			}
+			else
+			{
+				log::info(log_source::renderer, p_callback_data->pMessage);
 			}
 
 			return VK_FALSE;
@@ -88,6 +92,7 @@ namespace cc::vk
 		{
 			// Add the debug utils extension.
 			extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+			m_validation_layers_enabled = true;
 		}
 
 		// Check if the requested validation layers are available.
@@ -153,8 +158,13 @@ namespace cc::vk
 			debug_messenger_create_info.messageType                        = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
 			debug_messenger_create_info.pfnUserCallback                    = params.debug_callback;
 			debug_messenger_create_info.pUserData                          = params.p_user_data;
+			debug_messenger_create_info.pNext                              = nullptr;
 
-			vk_ensure(details::create_debug_utils_messenger_ext(*m_instance, &debug_messenger_create_info, params.p_allocator, m_debug_messenger.get()), "Failed to create debug messenger.");
+			VkDebugUtilsMessengerEXT debug_messenger = VK_NULL_HANDLE;
+
+			vk_ensure(details::create_debug_utils_messenger_ext(*m_instance, &debug_messenger_create_info, params.p_allocator, &debug_messenger), "Failed to create debug messenger.");
+
+			m_debug_messenger = std::make_shared<VkDebugUtilsMessengerEXT>(debug_messenger);
 		}
 
 		log::info(log_source::renderer, "Vulkan instance created.");

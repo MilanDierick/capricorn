@@ -49,7 +49,7 @@ namespace cc
 		constexpr static void info(log_source source, spdlog::format_string_t<Args...> fmt, Args&&... args);
 
 		template<typename T>
-		constexpr static void warning(log_source source, const T& message);
+		constexpr static void warn(log_source source, const T& message);
 
 		template<typename... Args>
 		constexpr static void warning(log_source source, spdlog::format_string_t<Args...> fmt, Args&&... args);
@@ -80,7 +80,8 @@ namespace cc
 	constexpr void log::trace(log_source source, spdlog::format_string_t<Args...> fmt, Args&&... args)
 	{
 		auto formatted_string = fmt::format(fmt, std::forward<Args>(args)...);
-		s_logger->trace(log_source_to_string(source) + formatted_string);	}
+		s_logger->trace(log_source_to_string(source) + formatted_string);
+	}
 
 	template<typename T>
 	constexpr void log::info(log_source source, const T& message)
@@ -92,10 +93,11 @@ namespace cc
 	constexpr void log::info(log_source source, spdlog::format_string_t<Args...> fmt, Args&&... args)
 	{
 		auto formatted_string = fmt::format(fmt, std::forward<Args>(args)...);
-		s_logger->info(log_source_to_string(source) + formatted_string);	}
+		s_logger->info(log_source_to_string(source) + formatted_string);
+	}
 
 	template<typename T>
-	constexpr void log::warning(log_source source, const T& message)
+	constexpr void log::warn(log_source source, const T& message)
 	{
 		s_logger->warn(log_source_to_string(source) + message);
 	}
@@ -104,7 +106,8 @@ namespace cc
 	constexpr void log::warning(log_source source, spdlog::format_string_t<Args...> fmt, Args&&... args)
 	{
 		auto formatted_string = fmt::format(fmt, std::forward<Args>(args)...);
-		s_logger->warn(log_source_to_string(source) + formatted_string);	}
+		s_logger->warn(log_source_to_string(source) + formatted_string);
+	}
 
 	template<typename T>
 	constexpr void log::error(log_source source, const T& message)
@@ -129,7 +132,8 @@ namespace cc
 	constexpr void log::critical(log_source source, spdlog::format_string_t<Args...> fmt, Args&&... args)
 	{
 		auto formatted_string = fmt::format(fmt, std::forward<Args>(args)...);
-		s_logger->critical(log_source_to_string(source) + formatted_string);	}
+		s_logger->critical(log_source_to_string(source) + formatted_string);
+	}
 } // namespace cc
 
 #endif //CAPRICORN_LOG_HPP

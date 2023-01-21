@@ -18,11 +18,21 @@ namespace cc
 		                                                              .set_application_version(1, 0, 0)
 		                                                              .set_engine_version(1, 0, 0)
 		                                                              .set_api_version(1, 0, 0)
-		                                                              //.add_enabled_layer("VK_LAYER_KHRONOS_validation")
-		                                                              //.add_enabled_extension(VK_KHR_SURFACE_EXTENSION_NAME)
+		                                                              .add_enabled_layer("VK_LAYER_KHRONOS_validation")
+		                                                              .add_enabled_extension(VK_KHR_SURFACE_EXTENSION_NAME)
+		                                                              .set_validation_layers_enabled(true)
 		                                                              .get_create_info();
 
 		m_instance = std::make_unique<vk::instance>(instance_create_info);
+
+		VkSurfaceKHR surface = VK_NULL_HANDLE;
+
+		if (glfwCreateWindowSurface(*m_instance->get_handle().lock(), m_window.lock().get(), nullptr, &surface) != VK_SUCCESS)
+		{
+			throw std::runtime_error("Failed to create window surface!");
+		}
+
+		m_surface = std::make_shared<VkSurfaceKHR>(surface);
 
 		vk::device_create_info const device_create_info = {
 		        m_instance,
